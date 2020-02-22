@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
 import 'package:http/http.dart';
-import 'dart:convert' as convert;
+import 'dart:convert' ;
 import 'dart:io';
 
 
@@ -114,9 +114,9 @@ class _MyAppState extends State<MyApp> {
     var response = await post(url,headers:header,body:barcode);
     print('Response status: ${response.statusCode}');
 
-      var jsonResponse = response.body;
+      var jsonResponse = json.decode(response.body);//Data in JSON
 
-      print('Response body: $jsonResponse');
+      print('Response body: ${response.body}');
 
   }
 }
