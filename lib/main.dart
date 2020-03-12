@@ -4,21 +4,44 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
-import 'package:http/http.dart';
+
 import 'dart:convert' ;
 import 'dart:io';
+import 'package:qr_scanner/Drawer.dart';
+import 'package:qr_scanner/Restaurants.dart';
 
 
 void main() {
   runApp(MyApp());
 }
-
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'SkiptheQ',
+      //home: MyScan(),
+      initialRoute: '/',
+      routes: {
+        // When navigating to the "/" route, build the FirstScreen widget.
+
+        // When navigating to the "/second" route, build the SecondScreen widget.
+
+        '/': (context) => MyScan(),
+        '/rest':(context) =>Restaurants(),
+
+      },
+
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
+
+class MyScan extends StatefulWidget {
+  @override
+  _MyScanState createState() => _MyScanState();
+}
+
+class _MyScanState extends State<MyScan> {
   String barcode = '';
   Uint8List bytes = Uint8List(200);
   String Data;
@@ -35,6 +58,7 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: Text('Qrcode Scanner Example'),
         ),
+        drawer: MyDrawer(),
         body: SingleChildScrollView(
           child: Center(
             child: Column(
@@ -88,10 +112,15 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future _scan() async {
-    String barcode = await scanner.scan();
+    String barcode = await scanner.scan().then(
+        (val)=>  Navigator.push(context, MaterialPageRoute(
+          builder: (context) => Restaurants(result: val),
+        ))
+
+    );
     setState(() => this.barcode = barcode);
     //print('H:$barcode');
-   getPost();
+
   }
 
   Future _scanPhoto() async {
@@ -105,18 +134,6 @@ class _MyAppState extends State<MyApp> {
     Uint8List result = await scanner.generateBarCode(Data);
     this.setState(() => this.bytes = result);
   }
-  void getPost() async{
-    //print('H2222:$barcode');
-    var url = 'https://skip-the-queue.herokuapp.com/foodcourt/mallinfo';
 
-    final header = {'Content-Type': 'application/json'};
-
-    var response = await post(url,headers:header,body:barcode);
-    print('Response status: ${response.statusCode}');
-
-      var jsonResponse = json.decode(response.body);//Data in JSON
-
-      print('Response body: ${response.body}');
-
-  }
 }
+
